@@ -2,10 +2,12 @@ import React, { useEffect, useState } from "react";
 import type { FormData } from "../interfaces/general";
 import Spinner from "./Spinner";
 import { defaultFormData } from "../utils/defaultData";
+import { formattedData } from "../utils/helpers";
 
 const Preview: React.FC = () => {
   const [formData, setFormData] = useState<FormData | null>(null);
-  const [isLoading, setIsLoading] = useState(true); // Estado para manejar el loader
+  const [isLoading, setIsLoading] = useState(true);
+  const [isCopied, setIsCopied] = useState(false);
 
   useEffect(() => {
     const data: FormData = JSON.parse(localStorage.getItem("formData") || "{}");
@@ -18,39 +20,11 @@ const Preview: React.FC = () => {
 
   const copyToClipboard = () => {
     if (formData) {
-      const formattedData = `
-<img src="https://github.com/user-attachments/assets/2cf4109d-0f1c-4df8-8815-6eadca2d7ed0" alt="Logo" style="vertical-align: middle; margin-left: 10px; width: 20px; height: auto;"><br>
-# [${formData.category}]: ${formData.title} 
-
-Hi @${formData.directedTo} and everyone!, I'm a Dojo Coding member⛩️ 
-
-${formData.description}
-
-## Steps to Resolve:
-${formData.lists
-  .map(
-    (list, index) => `
-<details>
-  <summary><strong>${index + 1}) ${list.title}</strong></summary>
-  <br>
-  <ul>
-    ${list.items.map((item) => `<li>${item.name}</li>`).join("")}
-  </ul>
-</details>
-`
-  )
-  .join("")}
-
----
-
-**Estimated Time:** ${formData.estimatedTime.start}-${
-        formData.estimatedTime.end
-      } ${formData.estimatedTime.unit}
-
-${formData.gratitude}
-      `;
-      navigator.clipboard.writeText(formattedData).then(() => {
-        alert("¡Datos copiados al portapapeles en formato Markdown!");
+      navigator.clipboard.writeText(formattedData(formData)).then(() => {
+        setIsCopied(true);
+        setTimeout(() => {
+          setIsCopied(false);
+        }, 2000);
       });
     }
   };
@@ -60,7 +34,7 @@ ${formData.gratitude}
   }
 
   if (!formData) {
-    return <div>Cargando...</div>;
+    return <div>Loading...</div>;
   }
 
   return (
@@ -76,7 +50,7 @@ ${formData.gratitude}
         </div>
 
         {`\n## Steps to Resolve:`}
-        <div className="bg-white p-4 rounded-md max-h-40 overflow-y-auto">
+        <div className="bg-white p-4 rounded-md max-h-28 overflow-y-auto">
           {formData.lists.map((list, idx) => (
             <div key={idx}>
               {`### ${list.title}:`}
@@ -96,9 +70,12 @@ ${formData.gratitude}
 
       <button
         onClick={copyToClipboard}
-        className="mt-4 bg-green-500 text-white p-2 rounded-md"
+        className={`mt-4 font-bold text-white p-2 rounded-md transition-colors duration-300 ${
+          isCopied ? "bg-orange-500 cursor-not-allowed" : "bg-blue-500"
+        }`}
+        disabled={isCopied}
       >
-        Copiar al Portapapeles (Markdown)
+        {isCopied ? "Template copied successfully" : "Copy to clipboard (Markdown)"}
       </button>
     </div>
   );

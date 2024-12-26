@@ -1,15 +1,34 @@
+---
+// Obtener la ruta actual
+const currentPath = Astro.url;
+const { pathname } = currentPath;
+
+const Links = [
+  { href: "/design", text: "Design" },
+  { href: "/preview", text: "Preview" },
+  { href: "/contribution", text: "Contribution" },
+];
+---
+
 <header class="bg-white shadow p-4">
   <div class="container mx-auto flex justify-between items-center">
-    <h1 
+    <h1
       class="text-2xl font-bold text-gray-800 cursor-pointer"
       onclick="window.location.href='/'"
     >
-      Template maker
+      Dojo Coding Template Maker
     </h1>
     <nav class="flex">
-      <a href="/design" class="text-gray-700 hover:text-blue-500 mx-4">Design</a>
-      <a href="/preview" class="text-gray-700 hover:text-blue-500 mx-4">Preview</a>
-      <a href="/contribution" class="text-gray-700 hover:text-blue-500 mx-4">Contribution</a>
+      {
+        Links.map(({ href, text }) => (
+          <a
+            href={href}
+            class={`p-4 ${pathname === href ? "bg-blue-500 text-white font-bold rounded" : "text-gray-700 hover:text-blue-500"}`}
+          >
+            {text}
+          </a>
+        ))
+      }
     </nav>
   </div>
 </header>
