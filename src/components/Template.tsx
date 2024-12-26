@@ -1,38 +1,28 @@
 import React, { useEffect, useState } from "react";
-
-interface FormData {
-  title: string;
-  directedTo: string;
-  description: string;
-  category: string;
-  estimatedTime: {
-    start: number;
-    end: number;
-    unit: string;
-  };
-  gratitude: string;
-  lists: {
-    title: string;
-    items: { name: string }[]; 
-  }[];
-}
+import type { FormData } from "../interfaces/general";
+import Spinner from "./Spinner";
+import { defaultFormData } from "../utils/defaultData";
 
 const Preview: React.FC = () => {
   const [formData, setFormData] = useState<FormData | null>(null);
+  const [isLoading, setIsLoading] = useState(true); // Estado para manejar el loader
 
   useEffect(() => {
-    // Recuperamos los datos del formulario del localStorage
     const data: FormData = JSON.parse(localStorage.getItem("formData") || "{}");
-    setFormData(data);
+    const formDataToLoad =
+      Object.keys(data).length === 0 ? defaultFormData : data;
+
+    setFormData(formDataToLoad);
+    setIsLoading(false);
   }, []);
 
-  // Función para copiar los datos al portapapeles en formato Markdown
   const copyToClipboard = () => {
     if (formData) {
       const formattedData = `
-# [${formData.category}]: ${formData.title}
+<img src="https://github.com/user-attachments/assets/2cf4109d-0f1c-4df8-8815-6eadca2d7ed0" alt="Logo" style="vertical-align: middle; margin-left: 10px; width: 20px; height: auto;"><br>
+# [${formData.category}]: ${formData.title} 
 
-Hi @${formData.directedTo} and everyone!, I'm a Dojo Coding member  
+Hi @${formData.directedTo} and everyone!, I'm a Dojo Coding member⛩️ 
 
 ${formData.description}
 
@@ -42,6 +32,7 @@ ${formData.lists
     (list, index) => `
 <details>
   <summary><strong>${index + 1}) ${list.title}</strong></summary>
+  <br>
   <ul>
     ${list.items.map((item) => `<li>${item.name}</li>`).join("")}
   </ul>
@@ -56,13 +47,17 @@ ${formData.lists
         formData.estimatedTime.end
       } ${formData.estimatedTime.unit}
 
-**Gratitude:** ${formData.gratitude}
+${formData.gratitude}
       `;
       navigator.clipboard.writeText(formattedData).then(() => {
         alert("¡Datos copiados al portapapeles en formato Markdown!");
       });
     }
   };
+
+  if (isLoading) {
+    return <Spinner />;
+  }
 
   if (!formData) {
     return <div>Cargando...</div>;
@@ -82,14 +77,14 @@ ${formData.lists
 
         {`\n## Steps to Resolve:`}
         <div className="bg-white p-4 rounded-md max-h-40 overflow-y-auto">
-        {formData.lists.map((list, idx) => (
-          <div key={idx}>
-            {`### ${list.title}:`}
-            {list.items.map((item, index) => (
-              <div key={index}>{`- ${item.name}`}</div>
-            ))}
-          </div>
-        ))}
+          {formData.lists.map((list, idx) => (
+            <div key={idx}>
+              {`### ${list.title}:`}
+              {list.items.map((item, index) => (
+                <div key={index}>{`- ${item.name}`}</div>
+              ))}
+            </div>
+          ))}
         </div>
 
         {`\n**Estimated Time:** ${formData.estimatedTime.start}-${formData.estimatedTime.end} ${formData.estimatedTime.unit}`}

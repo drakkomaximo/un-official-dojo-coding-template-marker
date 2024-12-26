@@ -1,52 +1,23 @@
 import React, { useState, useEffect } from "react";
 import Modal from "./Modal";
+import Spinner from "./Spinner";
 
-interface ListItem {
-  id: number;
-  name: string;
-}
-
-interface List {
-  title: string;
-  items: ListItem[];
-}
-
-interface FormData {
-  title: string;
-  directedTo: string;
-  description: string;
-  category: string;
-  estimatedTime: {
-    start: number;
-    end: number;
-    unit: string;
-  };
-  gratitude: string;
-  lists: List[];
-}
+import type { FormData } from "../interfaces/general";
+import { defaultFormData } from "../utils/defaultData";
 
 const Formulary: React.FC = () => {
-  const [formData, setFormData] = useState<FormData>({
-    title: "",
-    directedTo: "",
-    description: "",
-    category: "",
-    estimatedTime: {
-      start: 0,
-      end: 0,
-      unit: "days",
-    },
-    gratitude: "",
-    lists: [],
-  });
-
+  const [formData, setFormData] = useState<FormData>(defaultFormData);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const savedData = localStorage.getItem("formData");
     if (savedData) {
       setFormData(JSON.parse(savedData));
+    } else {
+      setFormData(defaultFormData);
     }
+    setIsLoading(false);
   }, []);
 
   const handleChange = (
@@ -82,8 +53,12 @@ const Formulary: React.FC = () => {
   };
 
   useEffect(() => {
-    localStorage.setItem('formData', JSON.stringify(formData));
+    localStorage.setItem("formData", JSON.stringify(formData));
   }, [formData]);
+
+  if (isLoading) {
+    return <Spinner />;
+  }
 
   return (
     <div className="max-w-4xl mx-auto p-6 bg-white rounded-lg shadow-lg my-6">
@@ -247,7 +222,7 @@ const Formulary: React.FC = () => {
                     }}
                     className="mt-2 text-red-500 hover:text-red-700"
                   >
-                    Delete
+                    Remove List
                   </button>
                 </div>
               ))}
