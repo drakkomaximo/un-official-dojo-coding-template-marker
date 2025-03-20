@@ -202,6 +202,17 @@ const Formulary: React.FC = () => {
             >
               Create New List
             </button>
+            <button
+              type="button"
+              onClick={() => {
+                setFormData({ ...formData, lists: [] });
+                localStorage.setItem("formData", JSON.stringify(formData));
+              }}
+              className="mt-4 bg-red-500 text-white p-3 rounded-md"
+            >
+              Delete All Lists
+            </button>
+
             <div className="mt-6 space-y-4 max-h-[500px] overflow-y-auto">
               {formData.lists.map((list, index) => (
                 <div
