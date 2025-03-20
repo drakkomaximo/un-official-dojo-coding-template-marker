@@ -195,9 +195,10 @@ const Formulary: React.FC = () => {
             <h3 className="text-xl font-semibold text-gray-800">
               Steps to Resolve:
             </h3>
-            <button
-              type="button"
-              onClick={() => setIsModalOpen(true)}
+            <div className="flex gap-4">
+              <button
+                type="button"
+                onClick={() => setIsModalOpen(true)}
               className="mt-4 bg-blue-500 text-white p-3 rounded-md"
             >
               Create New List
@@ -212,6 +213,7 @@ const Formulary: React.FC = () => {
             >
               Delete All Lists
             </button>
+            </div>
 
             <div className="mt-6 space-y-4 max-h-[500px] overflow-y-auto">
               {formData.lists.map((list, index) => (
